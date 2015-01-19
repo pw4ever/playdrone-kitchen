@@ -4,7 +4,7 @@
 require 'json'
 
 Vagrant.configure("2") do |config|
-  #config.berkshelf.enabled = true
+  config.berkshelf.enabled = true
 
   config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder "srv/", "/srv/"
@@ -21,7 +21,6 @@ Vagrant.configure("2") do |config|
     box.vm.network :forwarded_port, guest: 80,   host: 4000 # Application
 
     box.vm.provision :chef_solo do |chef|
-      chef.cookbooks_path = "site-cookbooks"
       chef.roles_path = "roles"
       chef.run_list = [
         "recipe[hosts]",
