@@ -2,6 +2,7 @@ source "https://api.berkshelf.com"
 
 cookbook 'ntp'
 cookbook "elasticsearch"
+cookbook "apache2"
 cookbook "java"
 cookbook "graphite", :git => 'git://github.com/hw-cookbooks/graphite.git'
 cookbook "collectd", :git => 'git://github.com/coderanger/chef-collectd.git'

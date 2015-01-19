@@ -24,32 +24,44 @@ Vagrant.configure("2") do |config|
       chef.roles_path = "roles"
       chef.run_list = [
         "recipe[hosts]",
-        "recipe[base]",
         "recipe[time]",
         "role[collectd_graphite]",
         "role[elasticsearch]",
         "recipe[ruby]",
+        "recipe[app::unicorn]",
         "recipe[app::sidekiq]",
         "recipe[app::metrics]",
+        "recipe[app::git-daemon]",
+        "recipe[iptables]"
       ]
 
       chef.json = {
+        set_fqdn: 'node1',
         hosts: {
           'monitor' => '10.1.1.11',
-          'redis'   => '10.1.1.11',
           'node1'   => '10.1.1.11',
         },
 
-        apache:   { listen_ports: [8000] },
+        iptables: {
+            services: {
+                nginx: 80,
+                graphite: 8000,
+                elasticsearch: 8080,
+                git_daemon: 9418
+            }
+        },
+
         graphite: { listen_port: 8000, storage_schemas: [{ name: 'catchall', pattern: '^.*', retentions: '10s:3d' }] },
         elasticsearch: {
+          nginx: { users: [{username: "username", password: "password"}] },
           bootstrap: { mlockall: false },
           network: { publish_host: '10.1.1.11' },
-          'discovery.zen.ping.unicast.hosts' => ["node1"]
+          'discovery.zen.ping.unicast.hosts' => ['node1'],
         },
         app: {
           nodes: ['node1'],
-          sidekiq: { market_threads: 4, bg_threads: 2 }
+          sidekiq: { market_threads: 4, bg_threads: 2 },
+          unicorn: { user: "username", password: "password" },
         },
       }
     end
