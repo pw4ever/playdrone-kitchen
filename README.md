@@ -1,6 +1,17 @@
 PlayDrone Kitchen
 ===========================
 
+VM production setup
+----------------
+
+Dependencies:
+
+* [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+* [Vagrant](https://docs.vagrantup.com/v2/installation/index.html)
+* [RVM-ed Ruby](https://rvm.io/): `\curl -L https://get.rvm.io | bash -s stable --ruby`
+
+Using `./00go.sh` should (eventually) build and set up a VirtualBox VM that can host [Playdrone](); `/srv` in the guest is mapped to `./srv` in this directory.
+
 Production setup
 ----------------
 
