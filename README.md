@@ -11,7 +11,7 @@ Dependencies:
 * [ChefDK](https://github.com/opscode/chef-dk)
 * [RVM-ed Ruby](https://rvm.io/): `\curl -L https://get.rvm.io | bash -s stable --ruby`
 
-Using `./00prepare.sh` (only the first time) and then `./01go.sh` should (eventually) build and set up a VirtualBox VM that can host [Playdrone](); `/srv` in the guest is mapped to `./srv` in this directory.
+Using `./00prepare.sh` (only the first time) and then `./01go.sh` and `./02finish.sh` should build a VirtualBox VM that can host [the forked Playdrone](https://github.com/pw4ever/playdrone); `/srv` in the guest is mapped to `./srv` in this directory.
 
 Production setup
 ----------------

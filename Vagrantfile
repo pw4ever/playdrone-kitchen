@@ -12,8 +12,10 @@ Vagrant.configure("2") do |config|
   config.vm.define :node1 do |box|
     box.vm.provider(:virtualbox) do |vb|
       vb.name = box.vm.hostname = 'playdrone01'
-      vb.customize ["modifyvm", :id, "--memory", 4096]
+      #vb.customize ["modifyvm", :id, "--memory", 4096]
       vb.gui = true
+      vb.memory = 4096
+      #vb.cpus = 4
     end
     box.vm.network :private_network, ip: "10.1.1.11"
     box.vm.network :forwarded_port, guest: 8080, host: 8080 # Elastic search
@@ -53,7 +55,10 @@ Vagrant.configure("2") do |config|
 
         graphite: { listen_port: 8000, storage_schemas: [{ name: 'catchall', pattern: '^.*', retentions: '10s:3d' }] },
         elasticsearch: {
-          nginx: { users: [{username: "username", password: "password"}] },
+          nginx: { 
+              users: [{username: "username", password: "password"}],
+              ssl: {},
+          },
           bootstrap: { mlockall: false },
           network: { publish_host: '10.1.1.11' },
           'discovery.zen.ping.unicast.hosts' => ['node1'],
