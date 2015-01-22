@@ -6,12 +6,14 @@ require 'json'
 Vagrant.configure("2") do |config|
   config.berkshelf.enabled = true
 
-  config.vm.box = "ubuntu/trusty64"
+  #config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "hashicorp/precise64"
   config.vm.synced_folder "srv/", "/srv/"
 
   config.vm.define :node1 do |box|
     box.vm.provider(:virtualbox) do |vb|
-      vb.name = box.vm.hostname = 'playdrone01'
+      vb.name = 'playdrone01'
+      box.vm.hostname = 'node1'
       #vb.customize ["modifyvm", :id, "--memory", 4096]
       vb.gui = true
       vb.memory = 4096
@@ -25,46 +27,103 @@ Vagrant.configure("2") do |config|
     box.vm.provision :chef_solo do |chef|
       chef.roles_path = "roles"
       chef.run_list = [
-        "recipe[hosts]",
-        "recipe[time]",
-        "role[collectd_graphite]",
+        "recipe[system::hostname]",
+        "recipe[system::timezone]",
+        #"recipe[system::update_package_list]",
+        #"recipe[system::upgrade_packages]",
+
+        "recipe[rvm::system]",
+        "recipe[rvm::vagrant]",
+
+        "recipe[java]",
         "role[elasticsearch]",
-        "recipe[ruby]",
+
+        "recipe[nginx::default]",
+
+        "recipe[statsd]",
+
+        "role[collectd_graphite]",
+
         "recipe[app::unicorn]",
         "recipe[app::sidekiq]",
         "recipe[app::metrics]",
         "recipe[app::git-daemon]",
-        "recipe[iptables]"
+        #"recipe[iptables]",
       ]
 
       chef.json = {
-        set_fqdn: 'node1',
-        hosts: {
-          'monitor' => '10.1.1.11',
-          'node1'   => '10.1.1.11',
+        hostname: "playdrone01",
+
+        system: {
+          timezone: "UTC",
+          short_hostname: "playdrone01",
+          domain_name: "localdomain",
+          static_hosts: {
+            # collectd_graphite is deployed on monitor on port 2003
+            "10.1.1.11" => "monitor",
+          }
         },
 
-        iptables: {
-            services: {
-                nginx: 80,
-                graphite: 8000,
-                elasticsearch: 8080,
-                git_daemon: 9418
-            }
+        rvm: {
+            # https://github.com/fnichol/chef-rvm/blob/master/attributes/default.rb
+            default_ruby: "ruby-2.1",
+            rubies: [
+                {
+                  'version' => 'ruby-2.1',
+                  'ruby_string' => 'ruby-2.1',
+                },
+            ],
+            group_users: ["root", "vagrant"],
+            # https://github.com/fnichol/chef-rvm/issues/297
+            install_rubies: true,
+            # https://github.com/fnichol/chef-rvm/issues/299
+            gpg: {
+                homedir: "/root",
+            },
+            global_gems: [
+                {name: "bundler"},
+                {name: "chef"}, 
+            ],
+            rvmrc: {
+              'rvm_project_rvmrc'             => 1,
+              'rvm_gemset_create_on_use_flag' => 1,
+              'rvm_trust_rvmrcs_flag'         => 1,
+            },
         },
 
-        graphite: { listen_port: 8000, storage_schemas: [{ name: 'catchall', pattern: '^.*', retentions: '10s:3d' }] },
+        java: {
+          install_flavor: "openjdk",
+          jdk_version: "7",
+        },
+
+        graphite: { 
+          listen_port: 8000, 
+          storage_schemas: [{ name: 'catchall', 
+                              pattern: '^.*', 
+                              retentions: '10s:3d', }] 
+        },
+
         elasticsearch: {
+          # to prevent permission complication
+          uid: 0,
+          gid: 0,
+
           nginx: { 
               users: [{username: "username", password: "password"}],
               ssl: {},
           },
           bootstrap: { mlockall: false },
           network: { publish_host: '10.1.1.11' },
-          'discovery.zen.ping.unicast.hosts' => ['node1'],
+          'discovery.zen.ping.unicast.hosts' => ['playdrone01'],
         },
+
+        statsd: {
+            # https://github.com/hectcastro/chef-statsd/issues/38
+            nodejs_bin: "/usr/bin/node",
+        },
+
         app: {
-          nodes: ['node1'],
+          nodes: ['playdrone01'],
           sidekiq: { market_threads: 4, bg_threads: 2 },
           unicorn: { user: "username", password: "password" },
         },

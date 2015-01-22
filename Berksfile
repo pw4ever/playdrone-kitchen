@@ -1,16 +1,16 @@
 source "https://api.berkshelf.com"
 
-cookbook 'ntp'
-cookbook "elasticsearch"
-cookbook "apache2"
-cookbook "java"
-cookbook "graphite", :git => 'git://github.com/hw-cookbooks/graphite.git'
-cookbook "collectd", :git => 'git://github.com/coderanger/chef-collectd.git'
-cookbook "statsd",   :git => 'git://github.com/hectcastro/chef-statsd.git'
-cookbook 'rvm',      :git => 'git://github.com/fnichol/chef-rvm.git'
-cookbook 'redis',    :git => 'git://github.com/miah/chef-redis.git'
-cookbook 'user',     :git => 'git://github.com/fnichol/chef-user.git'
-cookbook 'timezone', :git => 'git://github.com/dragonsmith/chef-timezone.git'
+cookbook 'system', git: 'https://github.com/xhost-cookbooks/system'
+cookbook 'nginx', git: 'https://github.com/phlipper/chef-nginx'
+cookbook 'rvm', git: 'https://github.com/fnichol/chef-rvm'
+cookbook 'java', '~> 1.29.0'
+cookbook 'elasticsearch', git: 'https://github.com/elasticsearch/cookbook-elasticsearch'
+cookbook 'graphite', git: 'git://github.com/hw-cookbooks/graphite.git'
+# cookbook 'collectd', git: 'https://github.com/miah/chef-collectd'
+cookbook 'collectd', git: 'https://github.com/coderanger/chef-collectd'
+cookbook 'apache2', git: 'https://github.com/viverae-cookbooks/apache2'
+cookbook 'statsd',   git: 'git://github.com/hectcastro/chef-statsd.git'
+cookbook 'user', git: 'https://github.com/fnichol/chef-user'
 
 cookbook 'base',              :path => 'site-cookbooks/base'
 cookbook 'hosts',             :path => 'site-cookbooks/hosts'

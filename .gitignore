@@ -15,3 +15,5 @@ bin/*
 iso
 *.box
 logs
+.kitchen/
+.kitchen.local.yml
