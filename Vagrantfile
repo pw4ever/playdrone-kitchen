@@ -8,7 +8,11 @@ Vagrant.configure("2") do |config|
 
   #config.vm.box = "ubuntu/trusty64"
   config.vm.box = "hashicorp/precise64"
-  config.vm.synced_folder "srv/", "/srv/"
+  config.vm.synced_folder "srv/", "/srv/",
+      create: true,
+      group: "vagrant",
+      owner: "vagrant",
+      mount_options: ["dmode=755,fmode=664"]
 
   config.vm.define :node1 do |box|
     box.vm.provider(:virtualbox) do |vb|
@@ -104,16 +108,17 @@ Vagrant.configure("2") do |config|
         },
 
         elasticsearch: {
-          # to prevent permission complication
-          uid: 0,
-          gid: 0,
-
           nginx: { 
               users: [{username: "username", password: "password"}],
               ssl: {},
           },
+
           bootstrap: { mlockall: false },
-          network: { publish_host: '10.1.1.11' },
+          network: { 
+              publish_host: '10.1.1.11',
+              host: '10.1.1.11',
+          },
+          'discovery.zen.ping.multicast.enabled' => true,
           'discovery.zen.ping.unicast.hosts' => ['playdrone01'],
         },
 

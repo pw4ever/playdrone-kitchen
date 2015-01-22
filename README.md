@@ -11,7 +11,15 @@ Dependencies:
 * [ChefDK](https://github.com/opscode/chef-dk)
 * [RVM-ed Ruby](https://rvm.io/): `\curl -L https://get.rvm.io | bash -s stable --ruby`
 
-Using `./00prepare.sh` (only the first time) and then `./01go.sh` and `./02finish.sh` should build a VirtualBox VM that can host [the forked Playdrone](https://github.com/pw4ever/playdrone); `/srv` in the guest is mapped to `./srv` in this directory.
+Install:
+* `./00install-prepare.sh`: only need to run once.
+* `./00install.sh`
+* Encounter an error? Try `vagrant reload --provision` or, if that fails, `vagrant destroy; ./00install.sh`.
+
+Go:
+* `./01go.sh` or, more explicitly, `vagrant up`
+
+Now we shall have a VirtualBox VM that can host [the forked Playdrone](https://github.com/pw4ever/playdrone); `/srv` in the guest is mapped to `./srv` in this directory.
 
 Production setup
 ----------------
